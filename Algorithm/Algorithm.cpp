@@ -1,212 +1,61 @@
 ﻿#include <iostream>
 #include <vector>
 #include <list>
+#include <stack>
 using namespace std;
 
-template<typename T>
-class Node
+// Stack (LIFO Last-In-First-Out 후입선출)
+// EX) 되돌리기 Ctrl+Z
+
+template<typename T, typename Container = vector<T>>
+class Stack
 {
 public:
-	Node() : _prev(nullptr), _next(nullptr), _data(T())
+	void push(const T& value)
 	{
-
+		_container.push_back(value);
 	}
 
-	Node(const T& value) : _prev(nullptr), _next(nullptr), _data(value)
+	void pop()
 	{
-
+		_container.pop_back();
 	}
 
-public:
-	Node*	_prev;
-	Node*	_next;
-	T		_data;
-};
-
-template<typename T>
-class Iterator
-{
-public:
-	Iterator() : _node(nullptr)
+	T& top()
 	{
-
+		// back() : vector의 마지막 원소 레퍼런스를 반환함.
+		return _container.back();
 	}
 
-	Iterator(Node<T>* node) : _node(node)
-	{
-
-	}
-
-	// ++it
-	Iterator& operator++()
-	{
-		_node = _node->_next;
-		return *this;
-	}
-
-	// it++
-	Iterator operator++(int)
-	{
-		Iterator<T> temp = *this;
-		_node = _node->_next;
-		return temp;
-	}
-
-	// --it
-	Iterator& operator--()
-	{
-		_node = _node->_prev;
-		return *this;
-	}
-
-	// it--
-	Iterator operator--(int)
-	{
-		Iterator<T> temp = *this;
-		_node = _node->_prev;
-		return temp;
-	}
-
-	// *it
-	T& operator*()
-	{
-		return _node->_data;
-	}
-
-	bool operator==(const Iterator& other)
-	{
-		return _node == other._node;
-	}
-
-	bool operator!=(const Iterator& other)
-	{
-		return _node != other._node;
-	}
-
-public:
-	Node<T>* _node;
-};
-
-template<typename T>
-class List
-{
-public:
-	List() : _size(0)
-	{
-		// [head] <-> ... <-> [tail]
-		// _head와 _tail에 더미 노드를 연결한다.
-		_head = new Node<T>();
-		_tail = new Node<T>();
-		_head->_next = _tail;
-		_tail->_prev = _head;
-	}
-
-	~List()
-	{
-		while (_size > 0)
-			pop_back();
-
-		delete _head;
-		delete _tail;
-	}
-
-	void push_back(const T& value)
-	{
-		AddNode(_tail, value);
-	}
-
-	void pop_back()
-	{
-		RemoveNode(_tail->_prev);
-	}
+	bool empty() { return _container.empty(); }
+	int size() { return _container.size(); }
 
 private:
-	// [head] <-> [1] <-> [prevNode] <-> [before] <-> [tail]
-	// [head] <-> [1] <-> [prevNode] <-> [value] <-> [before] <-> [tail]
-	Node<T>* AddNode(Node<T>* before, const T& value)
-	{
-		Node<T>* newNode = new Node<T>(value);
-		Node<T>* prevNode = before->_prev;
-
-		prevNode->_next = newNode;
-		newNode->_prev = prevNode;
-
-		newNode->_next = before;
-		before->_prev = newNode;
-
-		_size++;
-
-		return newNode;
-	}
-
-	// [head] <-> [prevNode] <-> [node] <-> [nextNode] <-> [tail]
-	// [head] <-> [prevNode] <-> [nextNode] <-> [tail]
-	Node<T>* RemoveNode(Node<T>* node)
-	{
-		Node<T>* prevNode = node->_prev;
-		Node<T>* nextNode = node->_next;
-
-		prevNode->_next = nextNode;
-		nextNode->_prev = prevNode;
-
-		delete node;
-
-		_size--;
-
-		return nextNode;
-	}
-
-	int size() { return size; }
-	
-public:
-	using iterator = Iterator<T>;
-
-	iterator begin() { return iterator(_head->_next); }
-	iterator end() { return iterator(_tail); }
-
-	// it '앞에' 추가
-	iterator insert(iterator it, const T& value)
-	{
-		Node<T>* node = AddNode(it._node, value);
-		return iterator(node);
-	}
-
-	iterator erase(iterator it)
-	{
-		Node<T>* node = RemoveNode(it._node);
-		return iterator(node);
-	}
-
-private:
-	Node<T>*	_head;
-	Node<T>*	_tail;
-	int			_size;
+	//vector<T> _container;
+	//list<T> _container;
+	Container _container;
 };
 
 int main()
 {
-	List<int> li;
+	Stack<int, list<int>> s;
 
-	List<int>::iterator eraseIt;
-	for (int i = 0; i < 10; i++)
+	// 삽입
+	s.push(1);
+	s.push(2);
+	s.push(3);
+
+	// 비었는지 체크
+	while (s.empty() == false)
 	{
-		if (i == 5)
-		{
-			// li.end()는 데이터가 들어있는 마지막 위치의 다음 위치이다.
-			eraseIt = li.insert(li.end(), i);
-		}
-		else
-		{
-			li.push_back(i);
-		}
+		// 최상위 원소
+		int data = s.top();
+		// 최상위 원소 삭제(반환X)
+		s.pop();
+
+		cout << data << endl;
 	}
-
-	li.pop_back();
-
-	li.erase(eraseIt);
-
-	for (List<int>::iterator it = li.begin(); it != li.end(); it++)
-	{
-		cout << (*it) << endl;
-	}
+	
+	// 스택의 크기
+	int size = s.size();
 }
