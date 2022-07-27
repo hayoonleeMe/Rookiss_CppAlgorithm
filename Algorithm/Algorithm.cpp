@@ -2,60 +2,84 @@
 #include <vector>
 #include <list>
 #include <stack>
+#include <queue>
 using namespace std;
 
-// Stack (LIFO Last-In-First-Out 후입선출)
-// EX) 되돌리기 Ctrl+Z
+// Queue (FIFO First-In-First-Out 선입선출)
+// EX) 대기열
 
-template<typename T, typename Container = vector<T>>
-class Stack
+// [ ][front][ ][ ][ ][ ][back][ ][ ]
+template<typename T>
+class ArrayQueue
 {
 public:
+	ArrayQueue()
+	{
+		_container.resize(100);
+	}
+
 	void push(const T& value)
 	{
-		_container.push_back(value);
+		// TODO : 다 찼는지 체큰
+		if (_size == _container.size())
+		{
+			// 증설 작업
+			int newSize = max(1, _size * 2);
+			vector<T> newData;
+			newData.resize(newSize);
+
+			// 데이터 복사
+			for (int i = 0; i < _size; i++)
+			{
+				int index = (_front + i) % _container.size();
+				newData[i] = _container[index];
+			}
+
+			_container.swap(newData);
+			_front = 0;
+			_back = _size;
+		}
+
+		_container[_back] = value;
+		_back = (_back + 1) % _container.size();
+		_size++;
 	}
 
 	void pop()
 	{
-		_container.pop_back();
+		_front = (_front + 1) % _container.size();
+		_size--;
 	}
 
-	T& top()
+	T& front()
 	{
-		// back() : vector의 마지막 원소 레퍼런스를 반환함.
-		return _container.back();
+		return _container[_front];
 	}
 
-	bool empty() { return _container.empty(); }
-	int size() { return _container.size(); }
+	bool empty() { return _size == 0; }
+	int size() { return _size; }
 
 private:
-	//vector<T> _container;
-	//list<T> _container;
-	Container _container;
+	vector<T> _container;
+
+	int _front = 0;
+	int _back = 0;
+	int _size = 0;
 };
 
 int main()
 {
-	Stack<int, list<int>> s;
+	ArrayQueue<int> q;
 
-	// 삽입
-	s.push(1);
-	s.push(2);
-	s.push(3);
+	for (int i = 0; i < 10; i++)
+		q.push(i);
 
-	// 비었는지 체크
-	while (s.empty() == false)
+	while (q.empty() == false)
 	{
-		// 최상위 원소
-		int data = s.top();
-		// 최상위 원소 삭제(반환X)
-		s.pop();
-
-		cout << data << endl;
+		int value = q.front();
+		q.pop();
+		cout << value << endl;
 	}
-	
-	// 스택의 크기
-	int size = s.size();
+
+	int size = q.size();
 }
