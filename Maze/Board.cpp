@@ -3,7 +3,7 @@
 #include "ConsoleHelper.h"
 #include "Player.h"
 
-const char* TILE = "¡á";
+const char* TILE = "ï¿½ï¿½";
 
 Board::Board()
 {
@@ -39,7 +39,7 @@ void Board::Render()
 	}
 }
 
-// Binary Tree ¹Ì·Î »ı¼º ¾Ë°í¸®Áò
+// Binary Tree ë¯¸ë¡œ ìƒì„± ì•Œê³ ë¦¬ì¦˜
 // - Mazes For Programmers 
 void Board::GenerateMap()
 {
@@ -54,7 +54,7 @@ void Board::GenerateMap()
 		}
 	}
 	
-	// ·£´ıÀ¸·Î ¿ìÃø È¤Àº ¾Æ·¡·Î ±æÀ» ¶Õ´Â ÀÛ¾÷
+	// ëœë¤ìœ¼ë¡œ ìš°ì¸¡ í˜¹ì€ ì•„ë˜ë¡œ ê¸¸ì„ ëš«ëŠ” ì‘ì—…
 	for (int32 y = 0; y < _size; y++)
 	{
 		for (int32 x = 0; x < _size; x++)

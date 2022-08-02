@@ -13,7 +13,7 @@ void Player::Init(Board* board)
 	_path.clear();
 	_path.push_back(pos);
 
-	// ¸ñÀûÁö µµÂøÇÏ±â Àü¿¡´Â °è¼Ó ½ÇÇà
+	// ëª©ì ì§€ ë„ì°©í•˜ê¸° ì „ì—ëŠ” ê³„ì† ì‹¤í–‰
 	Pos dest = board->GetExitPos();
 
 	Pos front[4] =
@@ -26,30 +26,30 @@ void Player::Init(Board* board)
 
 	while (pos != dest)
 	{
-		// 1. ÇöÀç ¹Ù¶óº¸´Â ¹æÇâÀ» ±âÁØÀ¸·Î ¿À¸¥ÂÊÀ¸·Î °¥ ¼ö ÀÖ´ÂÁö È®ÀÎ.
+		// 1. í˜„ì¬ ë°”ë¼ë³´ëŠ” ë°©í–¥ì„ ê¸°ì¤€ìœ¼ë¡œ ì˜¤ë¥¸ìª½ìœ¼ë¡œ ê°ˆ ìˆ˜ ìˆëŠ”ì§€ í™•ì¸.
 		int32 newDir = (_dir - 1 + DIR_COUNT) % DIR_COUNT;
 
 		if (CanGo(pos + front[newDir]))
 		{
-			// ¿À¸¥ÂÊ ¹æÇâÀ¸·Î 90µµ È¸Àü.
+			// ì˜¤ë¥¸ìª½ ë°©í–¥ìœ¼ë¡œ 90ë„ íšŒì „.
 			_dir = newDir;
 
-			// ¾ÕÀ¸·Î ÇÑ º¸ ÀüÁø.
+			// ì•ìœ¼ë¡œ í•œ ë³´ ì „ì§„.
 			pos += front[_dir];
 
 			_path.push_back(pos);
 		}
-		// 2. ÇöÀç ¹Ù¶óº¸´Â ¹æÇâÀ» ±âÁØÀ¸·Î ÀüÁøÇÒ ¼ö ÀÖ´ÂÁö È®ÀÎ.
+		// 2. í˜„ì¬ ë°”ë¼ë³´ëŠ” ë°©í–¥ì„ ê¸°ì¤€ìœ¼ë¡œ ì „ì§„í•  ìˆ˜ ìˆëŠ”ì§€ í™•ì¸.
 		else if (CanGo(pos + front[_dir]))
 		{
-			// ¾ÕÀ¸·Î ÇÑ º¸ ÀüÁø.
+			// ì•ìœ¼ë¡œ í•œ ë³´ ì „ì§„.
 			pos += front[_dir];
 
 			_path.push_back(pos);
 		}
 		else
 		{
-			// ¿ŞÂÊ ¹æÇâÀ¸·Î 90µµ È¸Àü.
+			// ì™¼ìª½ ë°©í–¥ìœ¼ë¡œ 90ë„ íšŒì „.
 			_dir = (_dir + 1) % DIR_COUNT;
 		}
 	}
@@ -64,7 +64,7 @@ void Player::Init(Board* board)
 			s.push(_path[i]);
 	}
 
-	// ¸ñÀûÁö µµÂø
+	// ëª©ì ì§€ ë„ì°©
 	if (_path.empty() == false)
 		s.push(_path.back()); 
 
