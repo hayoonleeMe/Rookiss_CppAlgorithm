@@ -5,136 +5,84 @@
 #include <queue>
 using namespace std;
 
-using NodeRef = shared_ptr<struct Node>;
-
-
-
-template<typename T>
+template<typename T, typename Container = vector<T>, typename Predicate = less<T>>
 class PriorityQueue
 {
 public:
-	PriorityQueue()
-	{
-		_pq.reserve(100);
-	}
-
 	void push(const T& data)
 	{
-		_pq.push_back(data);
+		// 우선 힙 구조부터 맞춰준다.
+		_heap.push_back(data);
 
-		if (_pq.size() == 1)
-			return;
-
-		int idx = _pq.size() - 1;
-		int parent = -1;
-
-		while (idx != 0)
+		// 도장깨기 시작
+		int now = static_cast<int>(_heap.size()) - 1;
+		// 루트 노드까지
+		while (now > 0)
 		{
-			int changeIdx = -1;
-
-			// 왼쪽
-			if (idx % 2 == 1)
-			{
-				parent = idx / 2;
-
-				if (_pq[idx] > _pq[parent])
-					changeIdx = idx;
-			}
-			// 오른쪽
-			else
-			{
-				parent = idx / 2 - 1;
-
-				int large = idx;
-				if (_pq[idx] < _pq[idx - 1])
-					large = idx - 1;
-
-				if (_pq[large] > _pq[parent])
-					changeIdx = large;
-			}
-
-			if (changeIdx == -1)
+			// 부모 노드와 비교해서 더 작으면 패배
+			int next = (now - 1) / 2;
+			if (_predicate(_heap[now], _heap[next]))
 				break;
 
-			// 부모와 변경
-			int temp = _pq[parent];
-			_pq[parent] = _pq[changeIdx];
-			_pq[changeIdx] = temp;
-
-			idx = parent;
+			// 데이터 교체
+			::swap(_heap[now], _heap[next]);
+			now = next;
 		}
 	}
 
 	void pop()
 	{
-		if (_pq.size() == 1)
+		_heap[0] = _heap.back();
+		_heap.pop_back();
+
+		int now = 0;
+
+		while (true)
 		{
-			_pq.pop_back();
-			return;
-		}
+			int left = 2 * now + 1;
+			int right = 2 * now + 2;
 
-		_pq[0] = _pq[_pq.size() - 1];
-		_pq.resize(_pq.size() - 1);
+			// 리프에 도달한 경우
+			if (left >= (int)_heap.size())
+				break;
 
-		if (_pq.size() == 1)
-			return;
+			int next = now;
 
-		int idx = 0;
+			// 왼쪽과 비교
+			if (_predicate(_heap[next], _heap[left]))
+				next = left;
 
-		while (idx != _pq.size() - 1)
-		{
-			int ChangeIndex = -1;
-			int size = _pq.size();
-			int left = idx * 2 + 1;
-			int right = idx * 2 + 2;
+			// 둘 중 승자를 오른쪽과 비교
+			if (right < (int)_heap.size() && _predicate(_heap[next], _heap[right]))
+				next = right;
 
-			// 왼, 오 존재
-			if (right < size)
-			{
-				int large = right;
-				if (_pq[right] < _pq[left])
-					large = left;
+			// 왼쪽 오른쪽 둘 다 현재 값보다 작으면 종료
+			if (next == now)
+				break;
 
-				if (_pq[idx] < _pq[large])
-					ChangeIndex = large;
-			}
-			// 왼쪽만 존재
-			else if (left < size)
-			{
-				if (_pq[idx] < _pq[left])
-					ChangeIndex = left;
-			}
-
-			if (ChangeIndex == -1)
-				break;;
-
-			int temp = _pq[ChangeIndex];
-			_pq[ChangeIndex] = _pq[idx];
-			_pq[idx] = temp;
-
-			idx = ChangeIndex;
+			::swap(_heap[now], _heap[next]);
+			now = next;
 		}
 	}
 
 	T& top()
 	{
-		return _pq[0];
+		return _heap[0];
 	}
-
-	int size() { return _pq.size(); }
 
 	bool empty()
 	{
-		return _pq.empty();
+		return _heap.empty();
 	}
 
 private:
-	vector<T> _pq;
+	Container _heap = {};
+	Predicate _predicate = {};
 };
 
 int main()
 {
-	PriorityQueue<int> pq;
+	PriorityQueue<int, vector<int>, greater<int>> pq;
 	pq.push(100);
 	pq.push(300);
 	pq.push(200);
