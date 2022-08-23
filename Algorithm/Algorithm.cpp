@@ -7,91 +7,145 @@ using namespace std;
 
 using NodeRef = shared_ptr<struct Node>;
 
-struct Node
+
+
+template<typename T>
+class PriorityQueue
 {
-	Node() { }
-	Node(const string& data) : data(data) { }
-	
-	string			data;
-	vector<NodeRef>	children;
+public:
+	PriorityQueue()
+	{
+		_pq.reserve(100);
+	}
+
+	void push(const T& data)
+	{
+		_pq.push_back(data);
+
+		if (_pq.size() == 1)
+			return;
+
+		int idx = _pq.size() - 1;
+		int parent = -1;
+
+		while (idx != 0)
+		{
+			int changeIdx = -1;
+
+			// 왼쪽
+			if (idx % 2 == 1)
+			{
+				parent = idx / 2;
+
+				if (_pq[idx] > _pq[parent])
+					changeIdx = idx;
+			}
+			// 오른쪽
+			else
+			{
+				parent = idx / 2 - 1;
+
+				int large = idx;
+				if (_pq[idx] < _pq[idx - 1])
+					large = idx - 1;
+
+				if (_pq[large] > _pq[parent])
+					changeIdx = large;
+			}
+
+			if (changeIdx == -1)
+				break;
+
+			// 부모와 변경
+			int temp = _pq[parent];
+			_pq[parent] = _pq[changeIdx];
+			_pq[changeIdx] = temp;
+
+			idx = parent;
+		}
+	}
+
+	void pop()
+	{
+		if (_pq.size() == 1)
+		{
+			_pq.pop_back();
+			return;
+		}
+
+		_pq[0] = _pq[_pq.size() - 1];
+		_pq.resize(_pq.size() - 1);
+
+		if (_pq.size() == 1)
+			return;
+
+		int idx = 0;
+
+		while (idx != _pq.size() - 1)
+		{
+			int ChangeIndex = -1;
+			int size = _pq.size();
+			int left = idx * 2 + 1;
+			int right = idx * 2 + 2;
+
+			// 왼, 오 존재
+			if (right < size)
+			{
+				int large = right;
+				if (_pq[right] < _pq[left])
+					large = left;
+
+				if (_pq[idx] < _pq[large])
+					ChangeIndex = large;
+			}
+			// 왼쪽만 존재
+			else if (left < size)
+			{
+				if (_pq[idx] < _pq[left])
+					ChangeIndex = left;
+			}
+
+			if (ChangeIndex == -1)
+				break;;
+
+			int temp = _pq[ChangeIndex];
+			_pq[ChangeIndex] = _pq[idx];
+			_pq[idx] = temp;
+
+			idx = ChangeIndex;
+		}
+	}
+
+	T& top()
+	{
+		return _pq[0];
+	}
+
+	int size() { return _pq.size(); }
+
+	bool empty()
+	{
+		return _pq.empty();
+	}
+
+private:
+	vector<T> _pq;
 };
-
-NodeRef CreateTree()
-{
-	NodeRef root = make_shared<Node>("R1 개발실");
-	{
-		NodeRef node = make_shared<Node>("디자인팀");
-		root->children.push_back(node);
-		{
-			NodeRef leaf = make_shared<Node>("전투");
-			node->children.push_back(leaf);
-		}
-		{
-			NodeRef leaf = make_shared<Node>("경제");
-			node->children.push_back(leaf);
-		}
-		{
-			NodeRef leaf = make_shared<Node>("스토리");
-			node->children.push_back(leaf);
-		}
-	}
-	{
-		NodeRef node = make_shared<Node>("프로그래밍팀");
-		root->children.push_back(node);
-		{
-			NodeRef leaf = make_shared<Node>("서버");
-			node->children.push_back(leaf);
-		}
-		{
-			NodeRef leaf = make_shared<Node>("클라");
-			node->children.push_back(leaf);
-		}
-		{
-			NodeRef leaf = make_shared<Node>("엔진");
-			node->children.push_back(leaf);
-		}
-	}
-	{
-		NodeRef node = make_shared<Node>("아트팀");
-		root->children.push_back(node);
-		{
-			NodeRef leaf = make_shared<Node>("배경");
-			node->children.push_back(leaf);
-		}
-		{
-			NodeRef leaf = make_shared<Node>("캐릭터");
-			node->children.push_back(leaf);
-		}
-	}
-
-	return root;
-}
-
-void PrintTree(NodeRef root, int depth)
-{
-	for (int i = 0; i < depth; i++)
-		cout << "-";
-	cout << root->data << endl;
-
-	for (NodeRef& child : root->children)
-		PrintTree(child, depth + 1);
-}
-
-int GetHeight(NodeRef root)
-{
-	int height = 1;
-
-	for (NodeRef& child : root->children)
-		height = max(height, GetHeight(child) + 1);
-
-	return height;
-}
 
 int main()
 {
-	NodeRef root = CreateTree();
+	PriorityQueue<int> pq;
+	pq.push(100);
+	pq.push(300);
+	pq.push(200);
+	pq.push(500);
+	pq.push(400);
 
-	//PrintTree(root, 0);
+	while (pq.empty() == false)
+	{
+		int value = pq.top();
+		pq.pop();
 
-	cout << "Tree Height : " << GetHeight(root) << endl;
+		cout << value << endl;	
+	}
 }
